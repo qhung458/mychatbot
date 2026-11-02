@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153345">
+  <title>OLP Chat · Luyện tập local</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/markdown.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="top-line"></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Lịch sử hội thoại">
+      <div class="sidebar-top">
+        <a class="wordmark" href="/" aria-label="OLP Chat trang chủ"><img src="/static/logo.svg" alt=""><span>OLP<span class="wordmark-light">Chat</span><span class="local-label">LOCAL</span></span></a>
+        <button class="icon-button sidebar-close" id="closeSidebar" aria-label="Đóng lịch sử"><span data-icon="close"></span></button>
+      </div>
+      <button class="new-chat" id="newChat"><span data-icon="plus"></span>Cuộc trò chuyện mới<span class="key-hint">＋</span></button>
+      <label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Tìm kiếm hội thoại…" autocomplete="off" aria-label="Tìm kiếm hội thoại"></label>
+      <div class="history-label"><span>HỘI THOẠI CỦA BẠN</span><span id="chatCount">0</span></div>
+      <nav class="chat-list" id="chatList" aria-label="Danh sách cuộc trò chuyện"></nav>
+      <div class="sidebar-bottom">
+        <div class="practice-card"><span class="practice-icon" data-icon="target"></span><div><strong>Luyện cách hỏi. Tối ưu cách làm.</strong><p>Mỗi cuộc trò chuyện, 2.000 token.</p></div></div>
+        <button class="connection" id="settingsButton"><span class="status-dot" id="connectionDot"></span><span id="connectionLabel">Đang kiểm tra kết nối…</span><span data-icon="settings"></span></button>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main">
+      <header class="main-header">
+        <div class="header-identity"><button class="icon-button menu-button" id="menuButton" aria-label="Mở lịch sử"><span data-icon="menu"></span></button><img src="/static/logo.svg" alt="" class="header-logo"><div><div class="header-title">Olympic AI Chatbot <span class="practice-badge">Luyện tập</span></div><p>Trợ lý lập trình cho những bài toán Olympic AI</p></div></div>
+        <div class="budget" id="budgetBox" title="Ngân sách của chat đang chọn. Tin nhắn mới và output cùng dùng quỹ này.">
+          <div class="budget-icon" data-icon="tokens"></div><div><span class="budget-caption">Số token còn lại</span><div class="budget-amount"><strong id="remaining">2.000</strong><span>/ 2.000</span></div></div><span class="budget-bar"><span id="budgetFill"></span></span>
+        </div>
+      </header>
+      <section class="conversation" id="conversation" aria-label="Nội dung hội thoại">
+        <div class="welcome" id="welcome">
+          <div class="welcome-kicker"><span></span>KHÔNG GIAN LUYỆN TẬP OLYMPIC AI</div>
+          <img class="hero-logo" src="/static/logo.svg" alt="">
+          <h1>Từ ý tưởng đến <span>lời giải.</span></h1>
+          <p class="welcome-description">Phân tích đề, cải tiến baseline, đọc và sửa code.<br>Đặt câu hỏi rõ ràng để tận dụng từng token.</p>
+          <div class="suggestions" id="suggestions">
+            <button data-prompt="Gợi ý hướng tiếp cận một bài toán phân loại ảnh với dữ liệu ít và không có pretrained weights."><span class="suggestion-icon" data-icon="image"></span><span><strong>Bắt đầu từ một bài toán</strong><small>Gợi ý hướng tiếp cận phân loại ảnh</small></span><span class="suggestion-arrow" data-icon="arrow"></span></button>
+            <button data-prompt="Tôi nên xử lý dữ liệu mất cân bằng khi huấn luyện mô hình phân loại như thế nào? Hãy giải thích ngắn gọn và kèm ví dụ PyTorch."><span class="suggestion-icon" data-icon="chart"></span><span><strong>Chuẩn bị dữ liệu tốt hơn</strong><small>Xử lý dữ liệu mất cân bằng</small></span><span class="suggestion-arrow" data-icon="arrow"></span></button>
+            <button data-prompt="Trong môi trường thi offline trên Linux, tôi cần kiểm tra và dùng model đã cache sẵn như thế nào?"><span class="suggestion-icon" data-icon="terminal"></span><span><strong>Làm chủ môi trường thi</strong><small>Truy cập model đã cache trên Linux</small></span><span class="suggestion-arrow" data-icon="arrow"></span></button>
+            <button data-prompt="Làm sao nhận biết overfitting từ train loss và validation loss? Nên thử sửa những gì trước?"><span class="suggestion-icon" data-icon="spark"></span><span><strong>Hiểu kết quả huấn luyện</strong><small>Nhận biết và khắc phục overfitting</small></span><span class="suggestion-arrow" data-icon="arrow"></span></button>
+          </div>
+          <div class="welcome-note"><span data-icon="shield"></span>Chat mới bắt đầu với ngữ cảnh trống và 2.000 token.</div>
+        </div>
+        <div class="messages" id="messages" aria-live="off"></div>
+      </section>
+      <div class="composer-area">
+        <div class="notice" id="notice" role="status" hidden></div>
+        <form id="chatForm" class="composer">
+          <textarea id="messageInput" rows="1" maxlength="40000" placeholder="Mô tả bài toán, dán code hoặc hỏi về thuật toán…" aria-label="Nội dung tin nhắn"></textarea>
+          <div class="composer-toolbar"><span class="composer-tip"><span data-icon="code"></span>Rõ bài toán. Đủ ngữ cảnh.</span><div class="composer-actions"><span class="model-label"><span class="small-dot"></span>Gemini 3.5 Flash-Lite</span><button type="button" class="stop-button" id="stopButton" hidden><span class="stop-square"></span>Dừng</button><button type="submit" id="sendButton" class="send-button" aria-label="Gửi tin nhắn"><span data-icon="send"></span></button></div></div>
+        </form>
+        <div class="composer-meta"><span><kbd>Enter</kbd> để gửi <span class="meta-divider">·</span> <kbd>Shift + Enter</kbd> xuống dòng</span><span id="draftCount" aria-live="polite">Đã dùng: <strong>0</strong> token trong ô nhập</span></div>
+        <footer>Bản luyện tập local <span>·</span> System prompt mô phỏng <span>·</span> Không phải hệ thống chính thức của BTC</footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <div class="dialog-header"><div><span class="dialog-eyebrow">THIẾT LẬP LOCAL</span><h2 id="settingsTitle">Sẵn sàng cho buổi luyện tập</h2></div><button id="closeSettings" class="icon-button" aria-label="Đóng thiết lập"><span data-icon="close"></span></button></div>
+    <p id="settingsStatus"></p>
+    <ol class="setup-steps"><li>Tạo API key trong <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Google AI Studio ↗</a> và kiểm tra project <strong>chưa bật billing</strong>.</li><li>Sao chép <code>.env.example</code> thành <code>.env</code>. Điền <code>GEMINI_API_KEY</code> và đổi <code>GEMINI_FREE_TIER_CONFIRMED=true</code> khi đã kiểm tra.</li><li>Khởi động lại server. Không gửi API key trong cuộc trò chuyện hoặc commit lên GitHub.</li></ol>
+    <div class="policy-box"><strong>Ngân sách được tính thế nào?</strong><p>Mỗi chat bắt đầu với 2.000 token. Chỉ trừ tin nhắn mới và output, gồm thinking của model. Không trừ lại lịch sử hoặc system prompt. Hết token sẽ dừng sinh, có thể giữa câu/code.</p><p>Khi bấm Dừng hoặc mất kết nối mà chưa có usage cuối, phần output đã giữ chỗ được tính hết để tránh hoàn nhầm token. Bộ đếm khi chưa có API chỉ là ước lượng.</p></div>
+    <p class="settings-disclaimer">Web không xác minh được billing từ API key. Free Tier hết quota thì dừng; không có cơ chế chuyển dịch vụ trả phí.</p>
+    <button class="dialog-primary" id="doneSettings">Đã hiểu</button>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
