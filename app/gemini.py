@@ -1,5 +1,8 @@
 """The only outbound service. No automatic fallback, search, tools or paid tier switch."""
 from dataclasses import dataclass
+import os
+import ssl
+
 from google import genai
 from google.genai import types
 
@@ -14,10 +17,19 @@ class Chunk:
 class Gemini:
     def __init__(self, settings):
         self.model = settings.model
+        tls_options = {}
+        if os.name == 'nt' and not (os.getenv('SSL_CERT_FILE') or os.getenv('SSL_CERT_DIR')):
+            # Load Windows trusted roots while preserving TLS verification.
+            context = ssl.create_default_context()
+            tls_options = {
+                'client_args': {'verify': context},
+                'async_client_args': {'verify': context, 'ssl': context},
+            }
         self.client = genai.Client(
             api_key=settings.api_key,
             http_options=types.HttpOptions(
-                timeout=60000, retry_options=types.HttpRetryOptions(attempts=1)
+                timeout=60000, retry_options=types.HttpRetryOptions(attempts=1),
+                **tls_options,
             ),
         )
 

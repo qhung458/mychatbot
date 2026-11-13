@@ -236,6 +236,27 @@ input::placeholder {
 .sidebar-bottom {
   padding-top:12px;
 }
+.api-usage {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f7f9fa;
+  color: #526777;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.api-usage-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+  color: var(--navy);
+}
+.api-usage-heading a {
+  color: #a73d2d;
+  text-underline-offset: 2px;
+}
 .practice-card {
   display:flex;
   align-items:flex-start;

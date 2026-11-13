@@ -128,6 +128,18 @@ function renderMessages() {
   $('conversation').scrollTop = $('conversation').scrollHeight;
 }
 async function refreshChats() { state.chats = await api('/api/chats'); renderChats(); }
+async function refreshUsage() {
+  try {
+    const usage = await api('/api/usage');
+    $('apiUsageCount').textContent = `${format(usage.requests)} lượt sinh từ web hôm nay`;
+    $('apiUsageRemaining').textContent = usage.estimated_remaining === null
+      ? 'Xem AI Studio để biết quota project'
+      : `Ước tính còn ${format(usage.estimated_remaining)} / ${format(usage.daily_limit)} lượt`;
+  } catch {
+    $('apiUsageCount').textContent = 'Chưa tải được số lượt';
+    $('apiUsageRemaining').textContent = '';
+  }
+}
 async function openChat(id) {
   if (state.busy) return;
   try {
@@ -203,6 +215,7 @@ $('chatForm').addEventListener('submit', async e => {
   } finally {
     state.busy = false; $('stopButton').disabled = false; $('stopButton').textContent = 'Dừng';
     renderMessages(); draftChanged(); refreshChats().catch(() => {});
+    refreshUsage();
     if (state.chat?.remaining) $('messageInput').focus();
   }
 });
@@ -229,6 +242,7 @@ $('closeSettings').addEventListener('click', () => $('settingsDialog').close());
 $('doneSettings').addEventListener('click', () => $('settingsDialog').close());
 $('settingsDialog').addEventListener('click', e => { if (e.target === $('settingsDialog') && e.offsetX >= $('settingsDialog').clientWidth) $('settingsDialog').close(); });
 async function boot() {
+  refreshUsage();
   try {
     state.config = await api('/api/config');
     $('connectionDot').classList.toggle('ready', state.config.ready);
@@ -241,4 +255,5 @@ async function boot() {
     renderDraft(0, true);
   } catch { notice('Không kết nối được server local. Kiểm tra cửa sổ terminal rồi tải lại trang.', true); }
 }
+window.addEventListener('focus', refreshUsage);
 boot();

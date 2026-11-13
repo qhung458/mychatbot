@@ -23,6 +23,11 @@
       <div class="history-label"><span>HỘI THOẠI CỦA BẠN</span><span id="chatCount">0</span></div>
       <nav class="chat-list" id="chatList" aria-label="Danh sách cuộc trò chuyện"></nav>
       <div class="sidebar-bottom">
+        <section class="api-usage" aria-labelledby="apiUsageTitle" title="Chỉ tính lượt sinh được ghi nhận từ web local. Ngày mới bắt đầu lúc 0 giờ theo giờ Thái Bình Dương.">
+          <div class="api-usage-heading"><strong id="apiUsageTitle">Gemini API</strong><a href="https://aistudio.google.com/rate-limit" target="_blank" rel="noopener noreferrer">Xem quota ↗</a></div>
+          <div id="apiUsageCount" aria-live="polite">Đang tải số lượt…</div>
+          <div id="apiUsageRemaining">Chưa có quota ngày đã cấu hình</div>
+        </section>
         <div class="practice-card"><span class="practice-icon" data-icon="target"></span><div><strong>Luyện cách hỏi. Tối ưu cách làm.</strong><p>Mỗi cuộc trò chuyện, 2.000 token.</p></div></div>
         <button class="connection" id="settingsButton"><span class="status-dot" id="connectionDot"></span><span id="connectionLabel">Đang kiểm tra kết nối…</span><span data-icon="settings"></span></button>
       </div>

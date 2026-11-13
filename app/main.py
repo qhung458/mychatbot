@@ -102,6 +102,13 @@ def create_app(settings=None, provider=None):
     async def chats():
         return store.list()
 
+    @app.get('/api/usage')
+    async def api_usage():
+        requests = store.daily_usage(settings.model)
+        limit = settings.daily_request_limit
+        return dict(requests=requests, daily_limit=limit,
+                    estimated_remaining=max(0, limit - requests) if limit is not None else None)
+
     @app.post('/api/chats', status_code=201)
     async def new_chat():
         return store.create(settings.budget, settings.system_prompt)
@@ -164,6 +171,7 @@ def create_app(settings=None, provider=None):
                 if turn['allowance'] == 0:
                     used, status = 0, 'budget'
                 else:
+                    store.record_generation(settings.model)
                     stream = backend.stream(turn['history'], body.text, turn['allowance'], turn['prompt'])
                     stop_task = asyncio.create_task(stop.wait())
                     while True:
@@ -234,7 +242,7 @@ def create_app(settings=None, provider=None):
 
     @app.get('/')
     async def index():
-        return FileResponse(ROOT / 'static' / 'index.html')
+        return FileResponse(ROOT / 'static' / 'index.html', headers={'Cache-Control': 'no-cache'})
 
     return app
 

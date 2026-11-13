@@ -3,6 +3,10 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 import sqlite3
 from uuid import uuid4
+from zoneinfo import ZoneInfo
+
+
+PACIFIC = ZoneInfo('America/Los_Angeles')
 
 
 class ChatError(Exception):
@@ -30,6 +34,10 @@ class Store:
                     text TEXT NOT NULL, tokens INTEGER NOT NULL DEFAULT 0,
                     status TEXT NOT NULL DEFAULT 'complete'
                 );
+                CREATE TABLE IF NOT EXISTS api_daily_usage (
+                    day TEXT NOT NULL, model TEXT NOT NULL, requests INTEGER NOT NULL,
+                    PRIMARY KEY (day, model)
+                );
             ''')
             # A killed server cannot know how much an upstream request generated.
             # Reserved tokens stay consumed; do not silently refund uncertain usage.
@@ -54,6 +62,20 @@ class Store:
             db.execute('INSERT INTO chats VALUES (?,?,?,?,?,?,0,0,?)',
                        (chat_id, 'Cuộc trò chuyện mới', now, now, budget, budget, prompt))
         return self.get(chat_id)
+
+    def record_generation(self, model):
+        day = datetime.now(PACIFIC).date().isoformat()
+        with self.db() as db:
+            db.execute('''INSERT INTO api_daily_usage VALUES (?, ?, 1)
+                          ON CONFLICT(day, model) DO UPDATE SET requests = requests + 1''',
+                       (day, model))
+
+    def daily_usage(self, model):
+        day = datetime.now(PACIFIC).date().isoformat()
+        with self.db() as db:
+            row = db.execute('SELECT requests FROM api_daily_usage WHERE day=? AND model=?',
+                             (day, model)).fetchone()
+        return row['requests'] if row else 0
 
     def get(self, chat_id, messages=True):
         with self.db() as db:
