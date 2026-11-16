@@ -13,7 +13,7 @@ class Settings:
     free_tier_confirmed: bool = False
     database: Path = ROOT / 'data' / 'chat.sqlite3'
     model: str = 'gemini-3.5-flash-lite'
-    budget: int = 2000
+    budget: int = 1500
     system_prompt: str = ''
     daily_request_limit: int | None = None
 

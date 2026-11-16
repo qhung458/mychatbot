@@ -38,13 +38,18 @@ function toast(text) {
 function notice(text, error = false) {
   $('notice').textContent = text; $('notice').hidden = !text; $('notice').classList.toggle('error', error);
 }
+function chatBudget() {
+  return state.chat?.budget ?? state.config?.budget ?? 1500;
+}
 function setRemaining(value) {
+  const total = chatBudget();
+  $('budgetTotal').textContent = `/ ${format(total)}`;
   $('remaining').textContent = format(value);
-  $('budgetFill').style.width = `${Math.max(0, Math.min(100, value / 20))}%`;
+  $('budgetFill').style.width = `${Math.max(0, Math.min(100, 100 * value / total))}%`;
   $('budgetBox').classList.toggle('empty', value === 0);
 }
 function updateControls() {
-  const remaining = state.chat?.remaining ?? 2000;
+  const remaining = state.chat?.remaining ?? chatBudget();
   const empty = remaining === 0 && !state.busy;
   $('sendButton').hidden = state.busy;
   $('stopButton').hidden = !state.busy;
@@ -58,7 +63,7 @@ function renderDraft(tokens, exact, loading = false) {
   const label = $('draftCount'); label.replaceChildren(document.createTextNode('Đã dùng: '));
   const strong = document.createElement('strong'); strong.textContent = `${exact ? '' : '≈ '}${format(tokens)}`;
   label.append(strong, document.createTextNode(` token trong ô nhập${loading ? ' · đang đếm…' : ''}`));
-  label.classList.toggle('over-budget', tokens > (state.chat?.remaining ?? 2000));
+  label.classList.toggle('over-budget', tokens > (state.chat?.remaining ?? chatBudget()));
   label.title = exact ? 'Số token từ API Gemini. Chưa gửi thì chưa trừ ngân sách.' : 'Ước lượng, không dùng để trừ ngân sách. Khi gửi, backend đếm bằng API Gemini.';
   updateControls();
 }
@@ -124,7 +129,7 @@ function renderMessages() {
   const messages = state.chat?.messages || [];
   $('welcome').hidden = messages.length > 0; $('messages').hidden = messages.length === 0;
   $('messages').replaceChildren(...messages.map(m => makeMessage(m.role, m.text, m.status).article));
-  setRemaining(state.chat?.remaining ?? 2000); updateControls();
+  setRemaining(state.chat?.remaining ?? chatBudget()); updateControls();
   $('conversation').scrollTop = $('conversation').scrollHeight;
 }
 async function refreshChats() { state.chats = await api('/api/chats'); renderChats(); }
@@ -204,7 +209,7 @@ $('chatForm').addEventListener('submit', async e => {
       else if (kind === 'done') {
         completed = true; state.chat = data.chat;
         if (data.uncertain) notice('Phản hồi đã dừng nhưng chưa có usage cuối. Phần output giữ chỗ được tính hết để bảo toàn giới hạn.');
-        else if (data.status === 'budget') notice('Chat đã hết 2.000 token. Tạo cuộc trò chuyện mới để tiếp tục.');
+        else if (data.status === 'budget') notice('Chat đã hết token. Tạo cuộc trò chuyện mới để tiếp tục.');
       }
     });
     if (!completed) throw new Error('Kết nối bị gián đoạn. Đang cập nhật lại trạng thái chat.');

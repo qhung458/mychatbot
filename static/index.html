@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/markdown.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <script src="/static/app.js?v=1500" defer></script>
 </head>
 <body>
   <div class="top-line"></div>
@@ -28,7 +28,7 @@
           <div id="apiUsageCount" aria-live="polite">Đang tải số lượt…</div>
           <div id="apiUsageRemaining">Chưa có quota ngày đã cấu hình</div>
         </section>
-        <div class="practice-card"><span class="practice-icon" data-icon="target"></span><div><strong>Luyện cách hỏi. Tối ưu cách làm.</strong><p>Mỗi cuộc trò chuyện, 2.000 token.</p></div></div>
+        <div class="practice-card"><span class="practice-icon" data-icon="target"></span><div><strong>Luyện cách hỏi. Tối ưu cách làm.</strong><p>Mỗi cuộc trò chuyện, 1.500 token.</p></div></div>
         <button class="connection" id="settingsButton"><span class="status-dot" id="connectionDot"></span><span id="connectionLabel">Đang kiểm tra kết nối…</span><span data-icon="settings"></span></button>
       </div>
     </aside>
@@ -37,7 +37,7 @@
       <header class="main-header">
         <div class="header-identity"><button class="icon-button menu-button" id="menuButton" aria-label="Mở lịch sử"><span data-icon="menu"></span></button><img src="/static/logo.svg" alt="" class="header-logo"><div><div class="header-title">Olympic AI Chatbot <span class="practice-badge">Luyện tập</span></div><p>Trợ lý lập trình cho những bài toán Olympic AI</p></div></div>
         <div class="budget" id="budgetBox" title="Ngân sách của chat đang chọn. Tin nhắn mới và output cùng dùng quỹ này.">
-          <div class="budget-icon" data-icon="tokens"></div><div><span class="budget-caption">Số token còn lại</span><div class="budget-amount"><strong id="remaining">2.000</strong><span>/ 2.000</span></div></div><span class="budget-bar"><span id="budgetFill"></span></span>
+          <div class="budget-icon" data-icon="tokens"></div><div><span class="budget-caption">Số token còn lại</span><div class="budget-amount"><strong id="remaining">1.500</strong><span id="budgetTotal">/ 1.500</span></div></div><span class="budget-bar"><span id="budgetFill"></span></span>
         </div>
       </header>
       <section class="conversation" id="conversation" aria-label="Nội dung hội thoại">
@@ -52,7 +52,7 @@
             <button data-prompt="Trong môi trường thi offline trên Linux, tôi cần kiểm tra và dùng model đã cache sẵn như thế nào?"><span class="suggestion-icon" data-icon="terminal"></span><span><strong>Làm chủ môi trường thi</strong><small>Truy cập model đã cache trên Linux</small></span><span class="suggestion-arrow" data-icon="arrow"></span></button>
             <button data-prompt="Làm sao nhận biết overfitting từ train loss và validation loss? Nên thử sửa những gì trước?"><span class="suggestion-icon" data-icon="spark"></span><span><strong>Hiểu kết quả huấn luyện</strong><small>Nhận biết và khắc phục overfitting</small></span><span class="suggestion-arrow" data-icon="arrow"></span></button>
           </div>
-          <div class="welcome-note"><span data-icon="shield"></span>Chat mới bắt đầu với ngữ cảnh trống và 2.000 token.</div>
+          <div class="welcome-note"><span data-icon="shield"></span>Chat mới bắt đầu với ngữ cảnh trống và 1.500 token.</div>
         </div>
         <div class="messages" id="messages" aria-live="off"></div>
       </section>
@@ -71,7 +71,7 @@
     <div class="dialog-header"><div><span class="dialog-eyebrow">THIẾT LẬP LOCAL</span><h2 id="settingsTitle">Sẵn sàng cho buổi luyện tập</h2></div><button id="closeSettings" class="icon-button" aria-label="Đóng thiết lập"><span data-icon="close"></span></button></div>
     <p id="settingsStatus"></p>
     <ol class="setup-steps"><li>Tạo API key trong <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Google AI Studio ↗</a> và kiểm tra project <strong>chưa bật billing</strong>.</li><li>Sao chép <code>.env.example</code> thành <code>.env</code>. Điền <code>GEMINI_API_KEY</code> và đổi <code>GEMINI_FREE_TIER_CONFIRMED=true</code> khi đã kiểm tra.</li><li>Khởi động lại server. Không gửi API key trong cuộc trò chuyện hoặc commit lên GitHub.</li></ol>
-    <div class="policy-box"><strong>Ngân sách được tính thế nào?</strong><p>Mỗi chat bắt đầu với 2.000 token. Chỉ trừ tin nhắn mới và output, gồm thinking của model. Không trừ lại lịch sử hoặc system prompt. Hết token sẽ dừng sinh, có thể giữa câu/code.</p><p>Khi bấm Dừng hoặc mất kết nối mà chưa có usage cuối, phần output đã giữ chỗ được tính hết để tránh hoàn nhầm token. Bộ đếm khi chưa có API chỉ là ước lượng.</p></div>
+    <div class="policy-box"><strong>Ngân sách được tính thế nào?</strong><p>Mỗi chat bắt đầu với 1.500 token. Chỉ trừ tin nhắn mới và output, gồm thinking của model. Không trừ lại lịch sử hoặc system prompt. Hết token sẽ dừng sinh, có thể giữa câu/code.</p><p>Khi bấm Dừng hoặc mất kết nối mà chưa có usage cuối, phần output đã giữ chỗ được tính hết để tránh hoàn nhầm token. Bộ đếm khi chưa có API chỉ là ước lượng.</p></div>
     <p class="settings-disclaimer">Web không xác minh được billing từ API key. Free Tier hết quota thì dừng; không có cơ chế chuyển dịch vụ trả phí.</p>
     <button class="dialog-primary" id="doneSettings">Đã hiểu</button>
   </dialog>

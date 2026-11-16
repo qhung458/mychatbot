@@ -77,24 +77,24 @@ class ChatTests(unittest.TestCase):
 
     def test_chat_isolation_and_budget_not_recharged_for_history(self):
         a, b = self.new(), self.new()
-        self.assertEqual(a['remaining'], 2000)
+        self.assertEqual(a['remaining'], 1500)
         self.assertEqual(a['messages'], [])
         self.assertNotIn('system_prompt', a)
         response = self.send(a, 'hello')
         self.assertIn('event: delta', response.text)
         self.assertIn('event: done', response.text)
-        self.assertEqual(self.get(a)['remaining'], 1992)  # 2000 - 5 - 3
+        self.assertEqual(self.get(a)['remaining'], 1492)  # 1500 - 5 - 3
         self.send(a, 'next')
-        self.assertEqual(self.get(a)['remaining'], 1985)  # only new 4 + 3
+        self.assertEqual(self.get(a)['remaining'], 1485)  # only new 4 + 3
         self.assertEqual(len(self.provider.calls[1]['history']), 2)
         self.send(b, 'new')
         self.assertEqual(self.provider.calls[2]['history'], [])
-        self.assertEqual(self.get(b)['remaining'], 1994)
+        self.assertEqual(self.get(b)['remaining'], 1494)
 
     def test_output_cap_is_remaining_after_input_and_stops_iterator(self):
         self.provider.mode = 'limit'
         chat = self.new()
-        response = self.send(chat, 'a' * 1990)
+        response = self.send(chat, 'a' * 1490)
         self.assertEqual(self.provider.calls[0]['allowance'], 10)
         self.assertEqual(self.get(chat)['remaining'], 0)
         self.assertEqual(self.get(chat)['messages'][-1]['status'], 'budget')
@@ -105,22 +105,22 @@ class ChatTests(unittest.TestCase):
 
     def test_input_can_exhaust_budget_without_calling_generation(self):
         chat = self.new()
-        self.send(chat, 'a' * 2000)
+        self.send(chat, 'a' * 1500)
         self.assertEqual(self.get(chat)['remaining'], 0)
         self.assertEqual(self.provider.calls, [])
 
     def test_reject_oversized_input_without_consuming_budget(self):
         chat = self.new()
-        response = self.send(chat, 'a' * 2001)
+        response = self.send(chat, 'a' * 1501)
         self.assertEqual(response.status_code, 422)
-        self.assertEqual(self.get(chat)['remaining'], 2000)
+        self.assertEqual(self.get(chat)['remaining'], 1500)
         self.assertEqual(self.get(chat)['messages'], [])
 
     def test_draft_count_does_not_consume_tokens(self):
         chat = self.new()
         count = self.client.post('/api/tokens', json={'text': 'example'}).json()
         self.assertEqual(count, {'tokens': 7, 'exact': True})
-        self.assertEqual(self.get(chat)['remaining'], 2000)
+        self.assertEqual(self.get(chat)['remaining'], 1500)
 
     def test_quota_error_refunds_and_hides_provider_error(self):
         self.provider.mode = 'quota'
@@ -128,7 +128,7 @@ class ChatTests(unittest.TestCase):
         response = self.send(chat, 'hello')
         self.assertIn('event: error', response.text)
         self.assertNotIn('A_SECRET_KEY', response.text)
-        self.assertEqual(self.get(chat)['remaining'], 2000)
+        self.assertEqual(self.get(chat)['remaining'], 1500)
         self.assertFalse(self.get(chat)['active'])
         self.assertEqual(self.get(chat)['messages'], [])
 
@@ -198,7 +198,7 @@ class ChatTests(unittest.TestCase):
         chat = self.new()
         self.send(chat, 'hello')
         store = Store(self.settings.database)
-        self.assertEqual(store.get(chat['id'])['remaining'], 1992)
+        self.assertEqual(store.get(chat['id'])['remaining'], 1492)
         turn = store.reserve(chat['id'], 'pending', 7)
         with self.assertRaises(ChatError):
             store.reserve(chat['id'], 'duplicate', 9)

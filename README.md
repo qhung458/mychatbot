@@ -37,12 +37,12 @@ Không chạy nhiều worker hoặc nhiều server dùng chung file SQLite; bả
 Không có key vẫn mở được giao diện, tạo/mở/tìm chat. Nút Gửi bị khóa; bộ đếm ô nhập có dấu `≈`
 và chỉ là ước lượng UTF-8, không phải token Gemini. Không có phản hồi AI giả.
 
-## Quy tắc 2.000 token
+## Quy tắc 1.500 token
 
-Mỗi chat mới có **2.000 token** và lịch sử rỗng:
+Mỗi chat mới có **1.500 token** và lịch sử rỗng:
 
 ```text
-còn lại = 2.000 − tổng token tin nhắn mới − tổng output (gồm thinking)
+còn lại = 1.500 − tổng token tin nhắn mới − tổng output (gồm thinking)
 ```
 
 - **Ô trên:** ngân sách còn lại của chat đang chọn.
@@ -51,10 +51,10 @@ còn lại = 2.000 − tổng token tin nhắn mới − tổng output (gồm th
   trước khi chấp nhận gửi, không tin con số từ trình duyệt.
 - Lịch sử cũ được gửi lại cho Gemini để giữ ngữ cảnh, **không trừ lại vào quỹ luyện tập**.
   Lượng token Google tính cho một API request khác với quỹ này.
-- System prompt được lưu riêng cho từng chat tại lúc tạo, **không trừ vào quỹ 2.000**.
+- System prompt được lưu riêng cho từng chat tại lúc tạo, **không trừ vào quỹ 1.500**.
   Đây là quy tắc mô phỏng, chưa xác minh BTC có tính system prompt/thinking như vậy không.
-- Ví dụ: gửi 300 token, model dùng 500 output token → còn 1.200. Lượt sau gửi 200 →
-  `max_output_tokens=1000`; không gửi yêu cầu sinh với hạn mức lớn hơn rồi mới cắt giao diện.
+- Ví dụ: gửi 300 token, model dùng 500 output token → còn 700. Lượt sau gửi 200 →
+  `max_output_tokens=500`; không gửi yêu cầu sinh với hạn mức lớn hơn rồi mới cắt giao diện.
 - Backend giữ chỗ toàn bộ phần output còn lại, chống gửi song song hoặc gửi lặp để vượt ngân sách.
 - `max_output_tokens` được truyền trực tiếp cho Gemini trước lúc sinh. Khi nhận `MAX_TOKENS` hoặc
   usage đạt giới hạn, đóng stream. Phản hồi có thể dừng giữa câu/code; hết token thì khóa chat.
@@ -116,7 +116,7 @@ Chỉ nghe `127.0.0.1`; không cấu hình để công khai ra mạng hoặc là
 |---|---|
 | `GET /api/config` | Trạng thái cấu hình không chứa key |
 | `GET /api/chats` | Danh sách và số dư |
-| `POST /api/chats` | Tạo chat 2.000 token |
+| `POST /api/chats` | Tạo chat 1.500 token |
 | `GET /api/chats/{id}` | Nội dung của một chat |
 | `POST /api/tokens` | Đếm `{ "text": "..." }`, không trừ quỹ |
 | `POST /api/chats/{id}/messages` | Nhận text và trả SSE `start/delta/usage/error/done` |
